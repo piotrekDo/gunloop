@@ -6,11 +6,15 @@
                 <ui:VisualElement name="Ammo" style="flex-grow: 0; flex-direction: row; width: auto; justify-content: center; align-self: auto; align-content: center; align-items: center;">
                     <ui:Label text="15" style="font-size: 50px; color: rgb(255, 245, 238); -unity-font-style: bold; align-content: flex-end; justify-content: flex-end;">
                         <Bindings>
-                            <ui:DataBinding property="text" data-source-path="m_gunPrimary.m_currentAmmo" binding-mode="ToTarget"/>
+                            <ui:DataBinding property="text" data-source-path="m_gunPrimary.m_currentClipAmmo" binding-mode="ToTarget"/>
                         </Bindings>
                     </ui:Label>
                     <ui:Label text="/" style="font-size: 40px; -unity-font-style: bold; color: rgb(255, 245, 238);"/>
-                    <ui:Label text="120" style="font-size: 40px; color: rgb(255, 245, 238); -unity-font-style: bold; align-content: flex-end; justify-content: flex-end; align-items: flex-end; -unity-text-align: lower-left;"/>
+                    <ui:Label text="120" style="font-size: 40px; color: rgb(255, 245, 238); -unity-font-style: bold; align-content: flex-end; justify-content: flex-end; align-items: flex-end; -unity-text-align: lower-left;">
+                        <Bindings>
+                            <ui:DataBinding property="text" data-source-path="m_gunPrimary.m_ammoLeft" binding-mode="ToTarget"/>
+                        </Bindings>
+                    </ui:Label>
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +10,8 @@ public class GunController : MonoBehaviour {
     [SerializeField] private int m_rpm;
     [SerializeField] private float m_bulletSpeed;
     [SerializeField] private int m_clipSize;
-    [SerializeField] private int m_currentAmmo;
+    [SerializeField] private int m_currentClipAmmo;
+    [SerializeField] private int m_ammoLeft;
     [SerializeField] private float m_clipReloadSpeed;
 
     [Header("Spread")]
@@ -19,6 +21,9 @@ public class GunController : MonoBehaviour {
 
     [Header("Sound Effects")]
     [SerializeField] private SoundEffectHandler m_fireSoundFX;
+    [SerializeField] private SoundEffectHandler m_gunEmptyFX;
+    [SerializeField] private SoundEffectHandler m_gunReloadFX;
+    [SerializeField] private SoundEffectHandler m_gunBoltFX;
 
     [Header("Bullet")]
     [SerializeField] private GameObject m_bulletPrefab;
@@ -26,12 +31,14 @@ public class GunController : MonoBehaviour {
     private float m_fireTimer = 0f;
     private float m_fireDelay;
 
+    private bool m_isGunReloading = false;
+
     public string GunName => m_gunName;
     public string GunType => m_gunType;
     public int RPM => m_rpm;
     public float BulletSpeed => m_bulletSpeed;
     public int ClipSize => m_clipSize;
-    public int CurrentAmmo => m_currentAmmo;
+    public int CurrentClipAmmo => m_currentClipAmmo;
     public float ClipReloadSpeed => m_clipReloadSpeed;
     public float FireDelay => 60f / m_rpm;
     public float SpreadPerShot => m_spreadPerShot;
@@ -45,12 +52,48 @@ public class GunController : MonoBehaviour {
 
     private void Awake() {
         m_fireDelay = 60f / m_rpm;
-        m_currentAmmo = m_clipSize + 1;
+        m_currentClipAmmo = m_clipSize + 1;
     }
 
     public bool FireShoot(float spread) {
-        if (m_fireTimer > 0f) return false;
-        return TrySpawnBullet(spread);
+        if (m_fireTimer > 0f) {
+            return false;
+        } else if (m_isGunReloading) {
+            if (m_currentClipAmmo > 0) {
+                return TrySpawnBullet(spread);
+            }
+            return false;
+        } else if (m_currentClipAmmo <= 0) {
+            m_gunEmptyFX.Play();
+            m_fireTimer = 1f;
+            return false;
+        } else {
+            return TrySpawnBullet(spread);
+        }
+    }
+
+    public void ReloadGun() {
+        if (m_isGunReloading || m_ammoLeft == 0)
+            return;
+        m_currentClipAmmo = m_currentClipAmmo > 0 ? 1 : 0;
+        StartCoroutine(ReloadRoutine());
+    }
+
+    private IEnumerator ReloadRoutine() {
+        m_isGunReloading = true;
+        m_gunReloadFX.Play();
+        yield return new WaitForSeconds(m_clipReloadSpeed);
+        if (m_currentClipAmmo == 0) {
+            m_gunBoltFX.Play();
+            yield return new WaitForSeconds(1f);
+        }
+        m_isGunReloading = false;
+        if (m_ammoLeft > 0) {
+            int reloadValue = Mathf.Min(m_clipSize, m_ammoLeft);
+            m_currentClipAmmo = m_currentClipAmmo + reloadValue;
+            m_ammoLeft -= reloadValue;
+        }
+        m_fireTimer = 0;
     }
 
     private bool TrySpawnBullet(float spread) {
@@ -73,7 +116,7 @@ public class GunController : MonoBehaviour {
         if (bulletRb != null)
             bulletRb.linearVelocity = direction * m_bulletSpeed;
 
-        m_currentAmmo -= 1;
+        m_currentClipAmmo -= 1;
         m_fireSoundFX.Play();
         m_fireTimer = m_fireDelay;
         return true;

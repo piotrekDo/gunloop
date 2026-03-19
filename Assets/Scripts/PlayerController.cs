@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour {
 
     [Header("Other")]
     [SerializeField] private Animator m_animator;
+    [SerializeField] private float k_reloadClipLength = 2f;
 
     private Rigidbody2D m_rb;
     private bool m_isRunning;
@@ -115,6 +116,20 @@ public class PlayerController : MonoBehaviour {
         Vector2 move = value.Get<Vector2>();
         bool isMoving = move.sqrMagnitude > 0.01f;
         m_animator.SetBool("isMoving", isMoving);
+    }
+
+    private void OnReload() {
+        float speed = k_reloadClipLength / m_gun.ClipReloadSpeed;
+        m_animator.SetFloat("reloadTime", speed);
+        m_animator.SetBool("isReloading", true);
+
+        m_currentSpread = Mathf.Min(m_currentSpread + (m_gun.MaxSpread / 2), m_gun.MaxSpread);
+
+        m_gun.ReloadGun();
+    }
+
+    private void OnReloadComplete() {
+        m_animator.SetBool("isReloading", false);
     }
 
     private void RotateToMouse() {
