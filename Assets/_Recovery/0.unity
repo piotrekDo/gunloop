@@ -149,7 +149,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManagerController
   m_gunPrimary: {fileID: 0}
-  smoevalue: 0
 --- !u!4 &311219209
 Transform:
   m_ObjectHideFlags: 0
