@@ -107,6 +107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletController
   m_maximumLifetime: 2
+  m_bulltetHitFX: {fileID: 6026489337604379841, guid: e2800b8cec400f14e98beb2b449e9687, type: 3}
 --- !u!50 &2532720895300704201
 Rigidbody2D:
   serializedVersion: 5

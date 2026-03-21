@@ -14,10 +14,11 @@ public class GunController : MonoBehaviour {
     [SerializeField] private int m_ammoLeft;
     [SerializeField] private float m_clipReloadSpeed;
 
-    [Header("Spread")]
-    [SerializeField] private float m_spreadPerShot;   // rozrzut dodawany przy ka¿dym strzale (stopnie)
-    [SerializeField] private float m_maxSpread;       // maksymalny rozrzut (stopnie)
-    [SerializeField] private float m_spreadDecayRate; // tempo malenia rozrzutu na sekundê (stopnie/s)
+    [Header("Accuracy")]
+    [SerializeField] private float m_maxSpread;       
+    [SerializeField] private float m_minSpread;       
+    [SerializeField] private float m_spreadPerShot;   
+    [SerializeField] private float m_spreadDecayRate; 
 
     [Header("Sound Effects")]
     [SerializeField] private SoundEffectHandler m_fireSoundFX;
@@ -42,6 +43,7 @@ public class GunController : MonoBehaviour {
     public float ClipReloadSpeed => m_clipReloadSpeed;
     public float FireDelay => 60f / m_rpm;
     public float SpreadPerShot => m_spreadPerShot;
+    public float MinSpread => m_minSpread;
     public float MaxSpread => m_maxSpread;
     public float SpreadDecayRate => m_spreadDecayRate;
 

@@ -505,8 +505,9 @@ MonoBehaviour:
   m_currentClipAmmo: 0
   m_ammoLeft: 60
   m_clipReloadSpeed: 2
-  m_spreadPerShot: 2
   m_maxSpread: 10
+  m_minSpread: 2
+  m_spreadPerShot: 2
   m_spreadDecayRate: 8
   m_fireSoundFX: {fileID: 448841492}
   m_gunEmptyFX: {fileID: 2049903038}
@@ -1263,8 +1264,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   m_moveSpeed: 4
-  m_strafeSpeed: 2
   m_runSpeed: 8
+  m_moveSpeedSpreadFactor: 0.5
   m_gun: {fileID: 604816024}
   m_crosshair: {fileID: 1860903806}
   m_animator: {fileID: 1517574216}
@@ -1666,6 +1667,63 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1001 &4475950842255662523
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1526221391804994547, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_Name
+      value: PF_Eneny_zombie_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.218
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.759
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1675,3 +1733,4 @@ SceneRoots:
   - {fileID: 1517574212}
   - {fileID: 942055816}
   - {fileID: 2026017637}
+  - {fileID: 4475950842255662523}

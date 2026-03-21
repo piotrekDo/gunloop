@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour {
     [Header("Move")]
     [SerializeField] private float m_moveSpeed = 5f;
-    [SerializeField] private float m_strafeSpeed = 4f;
     [SerializeField] private float m_runSpeed = 2f;
+    [SerializeField] private float m_moveSpeedSpreadFactor = .5f;
 
     [Header("Firing")]
     [SerializeField] private GunController m_gun;
@@ -38,14 +38,22 @@ public class PlayerController : MonoBehaviour {
 
 
     private void Update() {
-        if (m_gun != null && m_currentSpread > 0f)
-            m_currentSpread = Mathf.Max(0f, m_currentSpread - m_gun.SpreadDecayRate * Time.deltaTime);
-        m_crosshair.SetSpread(m_currentSpread);
+        if (m_gun != null) {
+            m_currentSpread = Mathf.Max(m_gun.MinSpread, m_currentSpread - m_gun.SpreadDecayRate * Time.deltaTime);
 
-        if (m_isFiring && m_gun != null) {
-            bool shotFired = m_gun.FireShoot(m_currentSpread);
-            if (shotFired) {
-                m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
+            float moveSpreadFloor = m_isRunning
+                ? m_gun.MaxSpread
+                : m_gun.MinSpread + m_rb.linearVelocity.magnitude * m_moveSpeedSpreadFactor;
+            m_currentSpread = Mathf.Max(m_currentSpread, moveSpreadFloor);
+
+            m_currentSpread = Mathf.Clamp(m_currentSpread, m_gun.MinSpread, m_gun.MaxSpread);
+
+            m_crosshair.SetSpread(m_currentSpread);
+
+            if (m_isFiring) {
+                bool shotFired = m_gun.FireShoot(m_currentSpread);
+                if (shotFired)
+                    m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
             }
         }
     }
@@ -58,14 +66,14 @@ public class PlayerController : MonoBehaviour {
     public void EquipGun(GunController gun) {
         if (gun == null)
             return;
-        m_gun = gun;
         ApplyGun(gun);
     }
 
     private void ApplyGun(GunController gun) {
         if (gun == null)
             return;
-        m_currentSpread = 0f;
+        m_gun = gun;
+        m_currentSpread = m_gun.MinSpread;
         GameEvents.Instance.PickupGun(gun);
     }
 
@@ -82,28 +90,17 @@ public class PlayerController : MonoBehaviour {
         if (keyboard.sKey.isPressed)
             vertical -= 1f;
         if (keyboard.aKey.isPressed)
-            horizontal += 1f;
-        if (keyboard.dKey.isPressed)
             horizontal -= 1f;
+        if (keyboard.dKey.isPressed)
+            horizontal += 1f;
 
         m_isRunning = keyboard.leftShiftKey.isPressed;
 
-        Vector2 input = new Vector2(horizontal, vertical);
-        if (input.sqrMagnitude > 1f)
-            input.Normalize();
+        Vector2 moveDir = new Vector2(horizontal, vertical);
+        if (moveDir.sqrMagnitude > 1f)
+            moveDir.Normalize();
 
-        Vector2 forward = transform.right;
-        Vector2 strafe = transform.up;
-        Vector2 moveDir = forward * input.y + strafe * input.x;
-
-        float speed;
-        if (input.x != 0 || input.y < 0)
-            speed = m_strafeSpeed;
-        else
-            speed = m_moveSpeed;
-
-        if (m_isRunning)
-            speed = m_runSpeed;
+        float speed = m_isRunning ? m_runSpeed : m_moveSpeed;
 
         m_rb.linearVelocity = moveDir * speed;
     }
