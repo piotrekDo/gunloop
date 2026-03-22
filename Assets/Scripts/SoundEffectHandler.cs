@@ -11,6 +11,8 @@ public class SoundEffectHandler : MonoBehaviour {
     [SerializeField] private float m_fadeTime = 1;
     Coroutine m_fadeRoutine;
 
+    public bool IsPlaying => m_audioSource.isPlaying;
+
     private void Awake() {
     if (m_audioSource == null)
         m_audioSource = GetComponent<AudioSource>();
@@ -20,9 +22,13 @@ public class SoundEffectHandler : MonoBehaviour {
     }
 
     public void Play() {
-
+        if (m_generators == null || m_generators.Count == 0) {
+            Debug.LogWarning("No audio clips!");
+            return;
+        }
         AudioClip generator = GetRandomClip();
         m_audioSource.pitch = GetRandomPitch();
+        m_audioSource.volume = 1f;
         m_audioSource.PlayOneShot(generator);
     }
 

@@ -164,7 +164,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 942055816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &371707924
+--- !u!1001 &346501978
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -178,11 +178,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.93
+      value: 0.80404
       objectReference: {fileID: 0}
     - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 8.63
+      value: -0.81785
       objectReference: {fileID: 0}
     - target: {fileID: 6035667209713307423, guid: db5a2fbc91f56884287f8f5a2ff9a363, type: 3}
       propertyPath: m_LocalPosition.z
@@ -381,6 +381,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -395,7 +396,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &519420030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -475,7 +476,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -506,6 +507,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43b22f43c8f1a064999f4a5bbbdda207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
+  m_target: {fileID: 1517574212}
 --- !u!1 &604816022
 GameObject:
   m_ObjectHideFlags: 0
@@ -557,7 +571,7 @@ MonoBehaviour:
   m_gunName: basic rifle
   m_gunType: RIFLE
   m_rpm: 450
-  m_bulletSpeed: 25
+  m_bulletSpeed: 90
   m_clipSize: 30
   m_currentClipAmmo: 0
   m_ammoLeft: 60
@@ -1172,6 +1186,7 @@ GameObject:
   - component: {fileID: 1517574214}
   - component: {fileID: 1517574213}
   - component: {fileID: 1517574216}
+  - component: {fileID: 1517574217}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1454,6 +1469,14 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!81 &1517574217
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1517574209}
+  m_Enabled: 1
 --- !u!1 &1860903802
 GameObject:
   m_ObjectHideFlags: 0
@@ -1736,4 +1759,4 @@ SceneRoots:
   - {fileID: 1517574212}
   - {fileID: 942055816}
   - {fileID: 2026017637}
-  - {fileID: 371707924}
+  - {fileID: 346501978}

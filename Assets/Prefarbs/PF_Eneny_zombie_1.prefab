@@ -35,6 +35,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5440838988376582639}
+  - {fileID: 7612990272395849158}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3888765254247914019
@@ -241,6 +242,9 @@ MonoBehaviour:
   m_maximumHp: 3
   m_currentHp: 0
   m_headshotSoundFX: {fileID: 1494069679644272143}
+  m_moanSoundsFX: {fileID: 9005245603060267525}
+  m_moanInterval: 2
+  m_moanChance: 1
 --- !u!95 &4615637328196261845
 Animator:
   serializedVersion: 7
@@ -336,3 +340,76 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
   m_PrefabInstance: {fileID: 3813252343817597838}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5539681762621653288
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6035667209713307423}
+    m_Modifications:
+    - target: {fileID: 1022981566547100925, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_Name
+      value: PF_SFX_Zombie_moans
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0050000353
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+--- !u!4 &7612990272395849158 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2685870954800655598, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+  m_PrefabInstance: {fileID: 5539681762621653288}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9005245603060267525 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3466056596944599853, guid: 5d5c4925f27d8474c8d5b346431a1302, type: 3}
+  m_PrefabInstance: {fileID: 5539681762621653288}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e947ddbb49f22d24db3ab62f58d976fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundEffectHandler
