@@ -1,9 +1,7 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class GunController : MonoBehaviour {
-
     [Header("Gun Info")]
     [SerializeField] private string m_gunName;
     [SerializeField] private string m_gunType;
@@ -15,10 +13,15 @@ public class GunController : MonoBehaviour {
     [SerializeField] private float m_clipReloadSpeed;
 
     [Header("Accuracy")]
-    [SerializeField] private float m_maxSpread;       
-    [SerializeField] private float m_minSpread;       
-    [SerializeField] private float m_spreadPerShot;   
-    [SerializeField] private float m_spreadDecayRate; 
+    [SerializeField] private float m_maxSpread;
+    [SerializeField] private float m_minSpread;
+    [SerializeField] private float m_spreadPerShot;
+    [SerializeField] private float m_spreadDecayRate;
+
+    [Header("Headshot")]
+    [SerializeField] private float m_headshotAimRadius = 0.3f;   // precyzja celowania
+    [SerializeField] private float m_headshotHitRadius = 0.55f;  // trajektoria przez centrum
+    [SerializeField] private float m_headshotMultiplier = 2f;
 
     [Header("Sound Effects")]
     [SerializeField] private SoundEffectHandler m_fireSoundFX;
@@ -31,7 +34,6 @@ public class GunController : MonoBehaviour {
 
     private float m_fireTimer = 0f;
     private float m_fireDelay;
-
     private bool m_isGunReloading = false;
 
     public string GunName => m_gunName;
@@ -47,31 +49,33 @@ public class GunController : MonoBehaviour {
     public float MaxSpread => m_maxSpread;
     public float SpreadDecayRate => m_spreadDecayRate;
 
-    private void Update() {
-        if (m_fireTimer > 0f)
-            m_fireTimer -= Time.deltaTime;
-    }
-
     private void Awake() {
         m_fireDelay = 60f / m_rpm;
         m_currentClipAmmo = m_clipSize + 1;
     }
 
-    public bool FireShoot(float spread) {
-        if (m_fireTimer > 0f) {
+    private void Update() {
+        if (m_fireTimer > 0f)
+            m_fireTimer -= Time.deltaTime;
+    }
+
+    public bool FireShoot(float spread, Vector2 originPos, Vector2 shootDir, Vector2 aimPosition) {
+        if (m_fireTimer > 0f)
             return false;
-        } else if (m_isGunReloading) {
-            if (m_currentClipAmmo > 0) {
-                return TrySpawnBullet(spread);
-            }
+
+        if (m_isGunReloading) {
+            if (m_currentClipAmmo > 0)
+                return TrySpawnBullet(spread, originPos, shootDir, aimPosition);
             return false;
-        } else if (m_currentClipAmmo <= 0) {
+        }
+
+        if (m_currentClipAmmo <= 0) {
             m_gunEmptyFX.Play();
             m_fireTimer = 1f;
             return false;
-        } else {
-            return TrySpawnBullet(spread);
         }
+
+        return TrySpawnBullet(spread, originPos, shootDir, aimPosition);
     }
 
     public void ReloadGun() {
@@ -89,30 +93,26 @@ public class GunController : MonoBehaviour {
             m_gunBoltFX.Play();
             yield return new WaitForSeconds(1f);
         }
+        int reloadValue = Mathf.Min(m_clipSize, m_ammoLeft);
+        m_currentClipAmmo = m_currentClipAmmo + reloadValue;
+        m_ammoLeft -= reloadValue;
         m_isGunReloading = false;
-        if (m_ammoLeft > 0) {
-            int reloadValue = Mathf.Min(m_clipSize, m_ammoLeft);
-            m_currentClipAmmo = m_currentClipAmmo + reloadValue;
-            m_ammoLeft -= reloadValue;
-        }
-        m_fireTimer = 0;
+        m_fireTimer = 0f;
     }
 
-    private bool TrySpawnBullet(float spread) {
-        Vector2 spawnPos = transform.position + transform.right * 1.5f + transform.up * -0.4f;
-
-        Vector2 mouseScreen = Mouse.current.position.ReadValue();
-        Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
-        Vector2 baseDir = (mouseWorld - spawnPos).normalized;
-
+    private bool TrySpawnBullet(float spread, Vector2 originPos, Vector2 shootDir, Vector2 aimPosition) {
+        Vector2 spawnPos = originPos + shootDir * 1.5f;
         float spreadAngle = Random.Range(-spread, spread);
-        Vector2 direction = RotateVector(baseDir, spreadAngle);
-
+        Vector2 direction = RotateVector(shootDir, spreadAngle);
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
         GameObject bullet = Instantiate(m_bulletPrefab);
         bullet.transform.position = spawnPos;
         bullet.transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+
+        BulletController bc = bullet.GetComponent<BulletController>();
+        if (bc != null)
+            bc.Init(aimPosition, m_headshotAimRadius, m_headshotHitRadius, m_headshotMultiplier);
 
         Rigidbody2D bulletRb = bullet.GetComponent<Rigidbody2D>();
         if (bulletRb != null)
@@ -128,9 +128,6 @@ public class GunController : MonoBehaviour {
         float rad = degrees * Mathf.Deg2Rad;
         float cos = Mathf.Cos(rad);
         float sin = Mathf.Sin(rad);
-        return new Vector2(
-            v.x * cos - v.y * sin,
-            v.x * sin + v.y * cos
-        );
+        return new Vector2(v.x * cos - v.y * sin, v.x * sin + v.y * cos);
     }
 }

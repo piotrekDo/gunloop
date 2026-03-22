@@ -30,10 +30,11 @@ Transform:
   m_GameObject: {fileID: 1526221391804994547}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.218, y: 1.759, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalPosition: {x: 1.86, y: 5.72, z: 0}
+  m_LocalScale: {x: 0.90000004, y: 0.90000004, z: 0.90000004}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 5440838988376582639}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3888765254247914019
@@ -81,8 +82,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -2133865141
+  m_SortingLayer: 4
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 3699765714879483155, guid: bcaa92efde42a5544b3cca543c3cc83a, type: 3}
@@ -119,8 +120,8 @@ Rigidbody2D:
     serializedVersion: 2
     m_Bits: 0
   m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_SleepingMode: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!60 &5598143862531888313
 PolygonCollider2D:
@@ -160,7 +161,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.94, y: 1.74}
+    oldSize: {x: 1.515625, y: 1.359375}
     newSize: {x: 1.94, y: 1.74}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -238,6 +239,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyZombieController
   m_maximumHp: 3
+  m_currentHp: 0
+  m_headshotSoundFX: {fileID: 1494069679644272143}
 --- !u!95 &4615637328196261845
 Animator:
   serializedVersion: 7
@@ -260,3 +263,76 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &3813252343817597838
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6035667209713307423}
+    m_Modifications:
+    - target: {fileID: 5776541013968192951, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_Name
+      value: PF_SFX_Headshot
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0050000353
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+--- !u!114 &1494069679644272143 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2330442075986498945, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+  m_PrefabInstance: {fileID: 3813252343817597838}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e947ddbb49f22d24db3ab62f58d976fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundEffectHandler
+--- !u!4 &5440838988376582639 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9181391540686445153, guid: 462dbfb69318f0a489afd27252c28d2a, type: 3}
+  m_PrefabInstance: {fileID: 3813252343817597838}
+  m_PrefabAsset: {fileID: 0}

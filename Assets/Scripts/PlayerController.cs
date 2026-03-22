@@ -29,6 +29,22 @@ public class PlayerController : MonoBehaviour {
         m_rb.freezeRotation = false;
     }
 
+    private void OnDrawGizmos() {
+    if (!Application.isPlaying) return;
+    
+    // Czerwona kropka = aktualny punkt spawnu pocisku
+    Vector2 muzzlePos = (Vector2)transform.position 
+        + (Vector2)transform.right * 1.5f 
+        + (Vector2)transform.up * -0.4f;
+    
+    Gizmos.color = Color.red;
+    Gizmos.DrawWireSphere(muzzlePos, 0.1f);
+    
+    // ¯ó³ta kropka = œrodek postaci
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(transform.position, 0.1f);
+}
+
     private void OnEnable() {
         ApplyGun(m_gun);
     }
@@ -50,11 +66,16 @@ public class PlayerController : MonoBehaviour {
 
             m_crosshair.SetSpread(m_currentSpread);
 
-            if (m_isFiring) {
-                bool shotFired = m_gun.FireShoot(m_currentSpread);
-                if (shotFired)
-                    m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
-            }
+        if (m_isFiring) {
+            // Oblicz kierunek od ŒRODKA gracza do myszy
+            Vector2 mouseScreen = Mouse.current.position.ReadValue();
+            Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
+            Vector2 shootDir = (mouseWorld - (Vector2)transform.position).normalized;
+
+            bool shotFired = m_gun.FireShoot(m_currentSpread, transform.position, shootDir, mouseWorld);
+            if (shotFired)
+                m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
+        }
         }
     }
 

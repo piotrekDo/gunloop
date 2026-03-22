@@ -12,8 +12,11 @@ public class SoundEffectHandler : MonoBehaviour {
     Coroutine m_fadeRoutine;
 
     private void Awake() {
-        if (m_playOnAwake)
-            Play();
+    if (m_audioSource == null)
+        m_audioSource = GetComponent<AudioSource>();
+    
+    if (m_playOnAwake)
+        Play();
     }
 
     public void Play() {
