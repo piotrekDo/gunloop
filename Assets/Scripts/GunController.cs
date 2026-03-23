@@ -18,6 +18,9 @@ public class GunController : MonoBehaviour {
     [SerializeField] private float m_spreadPerShot;
     [SerializeField] private float m_spreadDecayRate;
 
+    [Header("Noise")]
+    [SerializeField] private float m_noiseRadius = 15f;
+
     [Header("Headshot")]
     [SerializeField] private float m_headshotAimRadius = 0.3f;   // precyzja celowania
     [SerializeField] private float m_headshotHitRadius = 0.55f;  // trajektoria przez centrum
@@ -44,6 +47,7 @@ public class GunController : MonoBehaviour {
     public int CurrentClipAmmo => m_currentClipAmmo;
     public float ClipReloadSpeed => m_clipReloadSpeed;
     public float FireDelay => 60f / m_rpm;
+    public float NoiseRadius => m_noiseRadius;
     public float SpreadPerShot => m_spreadPerShot;
     public float MinSpread => m_minSpread;
     public float MaxSpread => m_maxSpread;
@@ -101,7 +105,7 @@ public class GunController : MonoBehaviour {
     }
 
     private bool TrySpawnBullet(float spread, Vector2 originPos, Vector2 shootDir, Vector2 aimPosition) {
-        Vector2 spawnPos = originPos + shootDir * 1.5f;
+        Vector2 spawnPos = originPos + shootDir * .9f;
         float spreadAngle = Random.Range(-spread, spread);
         Vector2 direction = RotateVector(shootDir, spreadAngle);
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

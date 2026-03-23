@@ -7,6 +7,8 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] private float m_moveSpeed = 5f;
     [SerializeField] private float m_runSpeed = 2f;
     [SerializeField] private float m_moveSpeedSpreadFactor = .5f;
+    [SerializeField] private float m_runNoiseRadius = 5f;
+
 
     [Header("Firing")]
     [SerializeField] private GunController m_gun;
@@ -30,20 +32,21 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void OnDrawGizmos() {
-    if (!Application.isPlaying) return;
-    
-    // Czerwona kropka = aktualny punkt spawnu pocisku
-    Vector2 muzzlePos = (Vector2)transform.position 
-        + (Vector2)transform.right * 1.5f 
-        + (Vector2)transform.up * -0.4f;
-    
-    Gizmos.color = Color.red;
-    Gizmos.DrawWireSphere(muzzlePos, 0.1f);
-    
-    // ¯ó³ta kropka = œrodek postaci
-    Gizmos.color = Color.yellow;
-    Gizmos.DrawWireSphere(transform.position, 0.1f);
-}
+        if (!Application.isPlaying)
+            return;
+
+        // Czerwona kropka = aktualny punkt spawnu pocisku
+        Vector2 muzzlePos = (Vector2) transform.position
+            + (Vector2) transform.right * 1.5f
+            + (Vector2) transform.up * -0.4f;
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(muzzlePos, 0.1f);
+
+        // ¯ó³ta kropka = œrodek postaci
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, 0.1f);
+    }
 
     private void OnEnable() {
         ApplyGun(m_gun);
@@ -66,16 +69,17 @@ public class PlayerController : MonoBehaviour {
 
             m_crosshair.SetSpread(m_currentSpread);
 
-        if (m_isFiring) {
-            // Oblicz kierunek od ŒRODKA gracza do myszy
-            Vector2 mouseScreen = Mouse.current.position.ReadValue();
-            Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
-            Vector2 shootDir = (mouseWorld - (Vector2)transform.position).normalized;
+            if (m_isFiring) {
+                // Oblicz kierunek od ŒRODKA gracza do myszy
+                Vector2 mouseScreen = Mouse.current.position.ReadValue();
+                Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(mouseScreen);
+                Vector2 shootDir = (mouseWorld - (Vector2) transform.position).normalized;
 
-            bool shotFired = m_gun.FireShoot(m_currentSpread, transform.position, shootDir, mouseWorld);
-            if (shotFired)
-                m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
-        }
+                bool shotFired = m_gun.FireShoot(m_currentSpread, transform.position, shootDir, mouseWorld);
+                if (shotFired)
+                    m_currentSpread = Mathf.Min(m_currentSpread + m_gun.SpreadPerShot, m_gun.MaxSpread);
+                GameEvents.Instance.MakeNoise(transform.position, m_gun.NoiseRadius); 
+            }
         }
     }
 
@@ -116,6 +120,8 @@ public class PlayerController : MonoBehaviour {
             horizontal += 1f;
 
         m_isRunning = keyboard.leftShiftKey.isPressed;
+        if (m_isRunning && m_rb.linearVelocity.magnitude > 0.1f)
+            GameEvents.Instance.MakeNoise(transform.position, m_runNoiseRadius);
 
         Vector2 moveDir = new Vector2(horizontal, vertical);
         if (moveDir.sqrMagnitude > 1f)

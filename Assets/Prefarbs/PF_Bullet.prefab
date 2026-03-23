@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BulletController
   m_maximumLifetime: 2
   m_hideDistance: 1.5
-  m_fadeInDuration: 0.1
+  m_fadeInDuration: 0.2
   m_bulletHitFX: {fileID: 6026489337604379841, guid: e2800b8cec400f14e98beb2b449e9687, type: 3}
 --- !u!50 &2532720895300704201
 Rigidbody2D:
