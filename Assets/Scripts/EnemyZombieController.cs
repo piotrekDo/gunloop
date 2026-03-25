@@ -146,8 +146,10 @@ public class EnemyZombieController : MonoBehaviour {
             m_headshotSoundFX.Play();
 
         m_currentHp -= damage;
-        if (m_currentHp <= 0)
+        if (m_currentHp <= 0) {
             Destroy(gameObject);
+            GameEvents.Instance.ZombieDies();
+        }
     }
 
     private bool CanSeePlayer() {

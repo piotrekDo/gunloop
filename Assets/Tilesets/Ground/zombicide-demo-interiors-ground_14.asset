@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: zombicide-demo-interiors-ground_14
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.Tilemaps.Tile
-  m_Sprite: {fileID: 1326476161, guid: d12d6c4394b401a4a87f40b1d88a54c5, type: 3}
+  m_Sprite: {fileID: -1118847943, guid: 2d092ef3358dead4c982a6e0432c848b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

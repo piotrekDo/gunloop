@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class Crosshair : MonoBehaviour {
     [Header("Settings")]
-    [SerializeField] private float m_baseSize = 40f;
+    [SerializeField] private float m_baseSize = 30f;
     [SerializeField] private float m_spreadMultiplier = 8f;
     [SerializeField] private float m_ringThickness = 2f;  
     [SerializeField] private Color m_color = Color.white;

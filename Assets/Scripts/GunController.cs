@@ -105,7 +105,7 @@ public class GunController : MonoBehaviour {
     }
 
     private bool TrySpawnBullet(float spread, Vector2 originPos, Vector2 shootDir, Vector2 aimPosition) {
-        Vector2 spawnPos = originPos + shootDir * .9f;
+        Vector2 spawnPos = originPos + shootDir * -.01f;
         float spreadAngle = Random.Range(-spread, spread);
         Vector2 direction = RotateVector(shootDir, spreadAngle);
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

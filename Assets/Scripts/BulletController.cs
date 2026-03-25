@@ -2,14 +2,13 @@ using UnityEngine;
 
 public class BulletController : MonoBehaviour {
     [SerializeField] private float m_maximumLifetime;
-    [SerializeField] private float m_hideDistance = 1.5f;
+    [SerializeField] private float m_hideDistance = .5f;
     [SerializeField] private float m_fadeInDuration = 0.1f;
     [SerializeField] private GameObject m_bulletHitFX;
 
     private float m_currentLifetime;
-    private float m_visibilityDelay;
     private SpriteRenderer m_spriteRenderer;
-    private bool m_hasHit = false;
+
 
     // headshot
     private Vector2 m_aimPosition;
@@ -31,17 +30,11 @@ public class BulletController : MonoBehaviour {
             m_spriteRenderer.color = Color.clear;
     }
 
-    private void Start() {
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null && rb.linearVelocity.magnitude > 0f)
-            m_visibilityDelay = m_hideDistance / rb.linearVelocity.magnitude;
-    }
-
     private void Update() {
         m_currentLifetime += Time.deltaTime;
 
-        if (m_spriteRenderer != null && m_currentLifetime >= m_visibilityDelay) {
-            float alpha = Mathf.Clamp01((m_currentLifetime - m_visibilityDelay) / m_fadeInDuration);
+        if (m_spriteRenderer != null && m_currentLifetime >= m_hideDistance) {
+            float alpha = Mathf.Clamp01((m_currentLifetime - m_hideDistance) / m_fadeInDuration);
             m_spriteRenderer.color = new Color(1f, 1f, 1f, alpha);
         }
 
@@ -50,10 +43,6 @@ public class BulletController : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
-        if (m_hasHit)
-            return;
-        m_hasHit = true;
-
         if (collision.TryGetComponent(out EnemyZombieController zombie)) {
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
             Vector2 bulletDir = rb.linearVelocity.normalized;
@@ -70,9 +59,15 @@ public class BulletController : MonoBehaviour {
             float damage = isHeadshot ? 1f * m_headshotMultiplier : 1f;
             zombie.TakeHit(damage, isHeadshot);
             SpawnVfxHit();
+        } else if (collision.TryGetComponent(out DoorController door)) {
+            door.TakeHit(1);
+            SpawnVfxHit();
+        } else if (collision.gameObject.layer == LayerMask.NameToLayer("Wall")) {
+            SpawnVfxHit();
         }
-
-        Destroy(gameObject);
+        if (!collision.gameObject.CompareTag("Player")) {
+            Destroy(gameObject);
+        }   
     }
 
     private void SpawnVfxHit() {

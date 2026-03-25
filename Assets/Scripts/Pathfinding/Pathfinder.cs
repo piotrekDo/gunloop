@@ -13,45 +13,55 @@ public class Pathfinder {
         Vector2Int start = WorldToGrid(startWorld);
         Vector2Int target = WorldToGrid(targetWorld);
 
-        List<PathNode> openList = new List<PathNode>();
+        SimplePriorityQueue<PathNode> openList = new SimplePriorityQueue<PathNode>();
         HashSet<Vector2Int> closedSet = new HashSet<Vector2Int>();
         Dictionary<Vector2Int, PathNode> allNodes = new Dictionary<Vector2Int, PathNode>();
 
-        PathNode startNode = new PathNode(start, true);
-        startNode.gCost = 0;
-        startNode.hCost = GetHeuristic(start, target);
-        openList.Add(startNode);
+        PathNode startNode = new PathNode(start, true) {
+            gCost = 0,
+            hCost = GetHeuristic(start, target)
+        };
+        openList.Enqueue(startNode);
         allNodes[start] = startNode;
 
         while (openList.Count > 0) {
-            PathNode current = GetLowestFCost(openList);
-
+            PathNode current = openList.Dequeue();
             if (current.gridPosition == target)
                 return RetracePath(current);
 
-            openList.Remove(current);
             closedSet.Add(current.gridPosition);
 
             foreach (Vector2Int neighbourPos in GetNeighbours(current.gridPosition)) {
-                if (closedSet.Contains(neighbourPos))
-                    continue;
-                if (!IsWalkable(neighbourPos))
+                if (closedSet.Contains(neighbourPos) || !IsWalkable(neighbourPos))
                     continue;
 
-                int newGCost = current.gCost + 1;
+                bool isDiagonal = neighbourPos.x != current.gridPosition.x && neighbourPos.y != current.gridPosition.y;
+
+                // blokada ruchu po rogach
+                if (isDiagonal) {
+                    Vector2Int side1 = new Vector2Int(current.gridPosition.x, neighbourPos.y);
+                    Vector2Int side2 = new Vector2Int(neighbourPos.x, current.gridPosition.y);
+                    if (!IsWalkable(side1) || !IsWalkable(side2))
+                        continue;
+                }
+
+                int moveCost = isDiagonal ? 14 : 10;
+                int newGCost = current.gCost + moveCost;
 
                 if (!allNodes.TryGetValue(neighbourPos, out PathNode neighbour)) {
                     neighbour = new PathNode(neighbourPos, true);
                     allNodes[neighbourPos] = neighbour;
                 }
 
-                if (newGCost < neighbour.gCost || !openList.Contains(neighbour)) {
+                if (newGCost < neighbour.gCost || !neighbour.opened) {
                     neighbour.gCost = newGCost;
                     neighbour.hCost = GetHeuristic(neighbourPos, target);
                     neighbour.parent = current;
 
-                    if (!openList.Contains(neighbour))
-                        openList.Add(neighbour);
+                    if (!neighbour.opened) {
+                        openList.Enqueue(neighbour);
+                        neighbour.opened = true;
+                    }
                 }
             }
         }
@@ -72,21 +82,17 @@ public class Pathfinder {
         return path;
     }
 
-    private PathNode GetLowestFCost(List<PathNode> list) {
-        PathNode lowest = list[0];
-        foreach (PathNode node in list)
-            if (node.fCost < lowest.fCost || (node.fCost == lowest.fCost && node.hCost < lowest.hCost))
-                lowest = node;
-        return lowest;
-    }
-
     private List<Vector2Int> GetNeighbours(Vector2Int pos) {
         return new List<Vector2Int>
         {
             pos + Vector2Int.up,
             pos + Vector2Int.down,
             pos + Vector2Int.left,
-            pos + Vector2Int.right
+            pos + Vector2Int.right,
+            pos + Vector2Int.up + Vector2Int.left,
+            pos + Vector2Int.up + Vector2Int.right,
+            pos + Vector2Int.down + Vector2Int.left,
+            pos + Vector2Int.down + Vector2Int.right
         };
     }
 
@@ -96,7 +102,9 @@ public class Pathfinder {
     }
 
     private int GetHeuristic(Vector2Int a, Vector2Int b) {
-        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+        int dx = Mathf.Abs(a.x - b.x);
+        int dy = Mathf.Abs(a.y - b.y);
+        return 10 * (dx + dy) - 6 * Mathf.Min(dx, dy); // diagonal distance
     }
 
     private Vector2Int WorldToGrid(Vector2 worldPos) {
@@ -107,5 +115,42 @@ public class Pathfinder {
 
     private Vector2 GridToWorld(Vector2Int gridPos) {
         return new Vector2(gridPos.x * k_cellSize, gridPos.y * k_cellSize);
+    }
+
+    // ---- PATH NODE ----
+    private class PathNode {
+        public Vector2Int gridPosition;
+        public int gCost = int.MaxValue;
+        public int hCost;
+        public PathNode parent;
+        public bool walkable;
+        public bool opened;
+
+        public int fCost => gCost + hCost;
+
+        public PathNode(Vector2Int pos, bool walkable) {
+            this.gridPosition = pos;
+            this.walkable = walkable;
+        }
+    }
+
+    // ---- PROSTA KOLEJKA PRIORYTETOWA ----
+    private class SimplePriorityQueue<T> where T : PathNode {
+        private List<T> nodes = new List<T>();
+
+        public int Count => nodes.Count;
+
+        public void Enqueue(T node) {
+            nodes.Add(node);
+            nodes.Sort((a, b) => a.fCost.CompareTo(b.fCost)); // prosty sort po fCost
+        }
+
+        public T Dequeue() {
+            if (nodes.Count == 0)
+                return null;
+            T node = nodes[0];
+            nodes.RemoveAt(0);
+            return node;
+        }
     }
 }
