@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2743976565169672527}
   - component: {fileID: 2532720895300704201}
   - component: {fileID: 5930836345273818492}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PF_Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,9 +107,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletController
   m_maximumLifetime: 2
-  m_hideDistance: 0.02
-  m_fadeInDuration: 0
+  m_hideDistance: 0.05
+  m_fadeInDuration: 0.5
   m_bulletHitFX: {fileID: 6026489337604379841, guid: e2800b8cec400f14e98beb2b449e9687, type: 3}
+  m_hitLayers:
+    serializedVersion: 2
+    m_Bits: 264
 --- !u!50 &2532720895300704201
 Rigidbody2D:
   serializedVersion: 5

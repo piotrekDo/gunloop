@@ -5,6 +5,7 @@ public class BulletController : MonoBehaviour {
     [SerializeField] private float m_hideDistance = .5f;
     [SerializeField] private float m_fadeInDuration = 0.1f;
     [SerializeField] private GameObject m_bulletHitFX;
+    [SerializeField] private LayerMask m_hitLayers;
 
     private float m_currentLifetime;
     private SpriteRenderer m_spriteRenderer;
@@ -16,6 +17,12 @@ public class BulletController : MonoBehaviour {
     private float m_headshotMultiplier;
     private float m_headshotAimRadius;
     private float m_headshotHitRadius;
+
+    private Vector2 m_lastPosition;
+
+    private void Start() {
+        m_lastPosition = transform.position;
+    }
 
     public void Init(Vector2 aimPosition, float headshotAimRadius, float headshotHitRadius, float headshotMultiplier) {
         m_aimPosition = aimPosition;
@@ -40,22 +47,36 @@ public class BulletController : MonoBehaviour {
 
         if (m_currentLifetime > m_maximumLifetime)
             Destroy(gameObject);
+
+        // raycast miêdzy poprzedni¹ a aktualn¹ pozycj¹
+        Vector2 currentPos = transform.position;
+        Vector2 dir = currentPos - m_lastPosition;
+        float dist = dir.magnitude;
+
+        if (dist > 0f) {
+            RaycastHit2D hit = Physics2D.Raycast(m_lastPosition, dir.normalized, dist, m_hitLayers);
+
+            if (hit.collider != null) {
+                transform.position = hit.point; // przesuñ pocisk do punktu trafienia
+                HandleHit(hit.collider);
+                return;
+            }
+        }
+
+        m_lastPosition = currentPos;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision) {
+
+    private void HandleHit(Collider2D collision) {
         if (collision.TryGetComponent(out EnemyZombieController zombie)) {
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
             Vector2 bulletDir = rb.linearVelocity.normalized;
-
-            // jak blisko centrum wroga przechodzi linia lotu pocisku
             Vector2 toEnemy = (Vector2) collision.transform.position - (Vector2) transform.position;
             float distanceAlongDir = Vector2.Dot(toEnemy, bulletDir);
             Vector2 closestPoint = (Vector2) transform.position + bulletDir * distanceAlongDir;
             float missDistance = Vector2.Distance(closestPoint, collision.transform.position);
-
             float aimDistance = Vector2.Distance(m_aimPosition, collision.transform.position);
             bool isHeadshot = aimDistance < m_headshotAimRadius && missDistance < m_headshotHitRadius;
-
             float damage = isHeadshot ? 1f * m_headshotMultiplier : 1f;
             zombie.TakeHit(damage, isHeadshot);
             SpawnVfxHit();
@@ -65,10 +86,37 @@ public class BulletController : MonoBehaviour {
         } else if (collision.gameObject.layer == LayerMask.NameToLayer("Wall")) {
             SpawnVfxHit();
         }
-        if (!collision.gameObject.CompareTag("Player")) {
-            Destroy(gameObject);
-        }   
+
+        Destroy(gameObject);
     }
+
+    //private void OnTriggerEnter2D(Collider2D collision) {
+    //    if (collision.TryGetComponent(out EnemyZombieController zombie)) {
+    //        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+    //        Vector2 bulletDir = rb.linearVelocity.normalized;
+
+    //        // jak blisko centrum wroga przechodzi linia lotu pocisku
+    //        Vector2 toEnemy = (Vector2) collision.transform.position - (Vector2) transform.position;
+    //        float distanceAlongDir = Vector2.Dot(toEnemy, bulletDir);
+    //        Vector2 closestPoint = (Vector2) transform.position + bulletDir * distanceAlongDir;
+    //        float missDistance = Vector2.Distance(closestPoint, collision.transform.position);
+
+    //        float aimDistance = Vector2.Distance(m_aimPosition, collision.transform.position);
+    //        bool isHeadshot = aimDistance < m_headshotAimRadius && missDistance < m_headshotHitRadius;
+
+    //        float damage = isHeadshot ? 1f * m_headshotMultiplier : 1f;
+    //        zombie.TakeHit(damage, isHeadshot);
+    //        SpawnVfxHit();
+    //    } else if (collision.TryGetComponent(out DoorController door)) {
+    //        door.TakeHit(1);
+    //        SpawnVfxHit();
+    //    } else if (collision.gameObject.layer == LayerMask.NameToLayer("Wall")) {
+    //        SpawnVfxHit();
+    //    }
+    //    if (!collision.gameObject.CompareTag("Player")) {
+    //        Destroy(gameObject);
+    //    }   
+    //}
 
     private void SpawnVfxHit() {
         if (m_bulletHitFX == null)

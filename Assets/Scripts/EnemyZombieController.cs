@@ -147,6 +147,8 @@ public class EnemyZombieController : MonoBehaviour {
 
         m_currentHp -= damage;
         if (m_currentHp <= 0) {
+            m_headshotSoundFX.transform.SetParent(null);
+            Destroy(m_headshotSoundFX.gameObject, 1f); // 1 sekunda wystarczy
             Destroy(gameObject);
             GameEvents.Instance.ZombieDies();
         }
