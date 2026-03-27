@@ -15,4 +15,5 @@ public class DoorController : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+
 }

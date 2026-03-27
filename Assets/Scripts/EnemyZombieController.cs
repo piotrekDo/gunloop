@@ -107,7 +107,7 @@ public class EnemyZombieController : MonoBehaviour {
 
     private void UpdateAlerted() {
         m_pathFollower.SetDestination(m_alertTarget);
-        Vector2 dir = m_pathFollower.GetMoveDirection(m_alertedSpeed);
+        Vector2 dir = m_pathFollower.GetMoveDirection();
 
         if (dir == Vector2.zero) {
             StartCoroutine(LookAroundAndWander());
@@ -120,7 +120,7 @@ public class EnemyZombieController : MonoBehaviour {
 
     private void UpdateChase() {
         m_pathFollower.SetDestination(m_player.position);
-        Vector2 dir = m_pathFollower.GetMoveDirection(m_chaseSpeed);
+        Vector2 dir = m_pathFollower.GetMoveDirection();
 
         if (dir == Vector2.zero) {
             // brak ścieżki — idź prosto jako fallback

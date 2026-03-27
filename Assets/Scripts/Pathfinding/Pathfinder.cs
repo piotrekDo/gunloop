@@ -4,40 +4,75 @@ using UnityEngine;
 public class Pathfinder {
     private LayerMask m_wallLayer;
     private const float k_cellSize = 0.5f;
+    private const int k_maxIterations = 1000;
+
+    // cache walkability — odpytujemy fizykê tylko raz per pozycja
+    private static Dictionary<Vector2Int, bool> s_walkabilityCache = new Dictionary<Vector2Int, bool>();
+
+    // reu¿ywalne bufory ¿eby nie alokowaæ co wywo³anie
+    private readonly Dictionary<Vector2Int, PathNode> m_allNodes = new Dictionary<Vector2Int, PathNode>();
+    private readonly HashSet<Vector2Int> m_closedSet = new HashSet<Vector2Int>();
+    private readonly SimplePriorityQueue m_openList = new SimplePriorityQueue();
+    private readonly List<Vector2> m_resultPath = new List<Vector2>();
+
+    // sta³e s¹siedztwo — bez alokacji listy co wywo³anie
+    private static readonly Vector2Int[] s_neighbours = new Vector2Int[]
+    {
+        new Vector2Int( 0,  1),
+        new Vector2Int( 0, -1),
+        new Vector2Int(-1,  0),
+        new Vector2Int( 1,  0),
+        new Vector2Int(-1,  1),
+        new Vector2Int( 1,  1),
+        new Vector2Int(-1, -1),
+        new Vector2Int( 1, -1),
+    };
 
     public Pathfinder(LayerMask wallLayer) {
         m_wallLayer = wallLayer;
+    }
+
+    // wyczyœæ cache gdy mapa siê zmienia (np. zniszczono drzwi)
+    public static void InvalidateCache() {
+        s_walkabilityCache.Clear();
     }
 
     public List<Vector2> FindPath(Vector2 startWorld, Vector2 targetWorld) {
         Vector2Int start = WorldToGrid(startWorld);
         Vector2Int target = WorldToGrid(targetWorld);
 
-        SimplePriorityQueue<PathNode> openList = new SimplePriorityQueue<PathNode>();
-        HashSet<Vector2Int> closedSet = new HashSet<Vector2Int>();
-        Dictionary<Vector2Int, PathNode> allNodes = new Dictionary<Vector2Int, PathNode>();
+        m_allNodes.Clear();
+        m_closedSet.Clear();
+        m_openList.Clear();
+        m_resultPath.Clear();
 
-        PathNode startNode = new PathNode(start, true) {
-            gCost = 0,
-            hCost = GetHeuristic(start, target)
-        };
-        openList.Enqueue(startNode);
-        allNodes[start] = startNode;
+        PathNode startNode = GetNode(start);
+        startNode.gCost = 0;
+        startNode.hCost = GetHeuristic(start, target);
+        startNode.opened = true;
+        m_openList.Enqueue(startNode);
 
-        while (openList.Count > 0) {
-            PathNode current = openList.Dequeue();
+        int iterations = 0;
+
+        while (m_openList.Count > 0) {
+            if (++iterations > k_maxIterations)
+                return null;
+
+            PathNode current = m_openList.Dequeue();
+
             if (current.gridPosition == target)
                 return RetracePath(current);
 
-            closedSet.Add(current.gridPosition);
+            m_closedSet.Add(current.gridPosition);
 
-            foreach (Vector2Int neighbourPos in GetNeighbours(current.gridPosition)) {
-                if (closedSet.Contains(neighbourPos) || !IsWalkable(neighbourPos))
+            for (int i = 0; i < s_neighbours.Length; i++) {
+                Vector2Int neighbourPos = current.gridPosition + s_neighbours[i];
+
+                if (m_closedSet.Contains(neighbourPos) || !IsWalkable(neighbourPos))
                     continue;
 
-                bool isDiagonal = neighbourPos.x != current.gridPosition.x && neighbourPos.y != current.gridPosition.y;
+                bool isDiagonal = s_neighbours[i].x != 0 && s_neighbours[i].y != 0;
 
-                // blokada ruchu po rogach
                 if (isDiagonal) {
                     Vector2Int side1 = new Vector2Int(current.gridPosition.x, neighbourPos.y);
                     Vector2Int side2 = new Vector2Int(neighbourPos.x, current.gridPosition.y);
@@ -48,10 +83,7 @@ public class Pathfinder {
                 int moveCost = isDiagonal ? 14 : 10;
                 int newGCost = current.gCost + moveCost;
 
-                if (!allNodes.TryGetValue(neighbourPos, out PathNode neighbour)) {
-                    neighbour = new PathNode(neighbourPos, true);
-                    allNodes[neighbourPos] = neighbour;
-                }
+                PathNode neighbour = GetNode(neighbourPos);
 
                 if (newGCost < neighbour.gCost || !neighbour.opened) {
                     neighbour.gCost = newGCost;
@@ -59,52 +91,48 @@ public class Pathfinder {
                     neighbour.parent = current;
 
                     if (!neighbour.opened) {
-                        openList.Enqueue(neighbour);
+                        m_openList.Enqueue(neighbour);
                         neighbour.opened = true;
                     }
                 }
             }
         }
 
-        return null;
+        return null; // brak œcie¿ki
+    }
+
+    private PathNode GetNode(Vector2Int pos) {
+        if (!m_allNodes.TryGetValue(pos, out PathNode node)) {
+            node = new PathNode(pos);
+            m_allNodes[pos] = node;
+        }
+        return node;
     }
 
     private List<Vector2> RetracePath(PathNode endNode) {
-        List<Vector2> path = new List<Vector2>();
         PathNode current = endNode;
-
         while (current != null) {
-            path.Add(GridToWorld(current.gridPosition));
+            m_resultPath.Add(GridToWorld(current.gridPosition));
             current = current.parent;
         }
-
-        path.Reverse();
-        return path;
-    }
-
-    private List<Vector2Int> GetNeighbours(Vector2Int pos) {
-        return new List<Vector2Int>
-        {
-            pos + Vector2Int.up,
-            pos + Vector2Int.down,
-            pos + Vector2Int.left,
-            pos + Vector2Int.right,
-            pos + Vector2Int.up + Vector2Int.left,
-            pos + Vector2Int.up + Vector2Int.right,
-            pos + Vector2Int.down + Vector2Int.left,
-            pos + Vector2Int.down + Vector2Int.right
-        };
+        m_resultPath.Reverse();
+        return m_resultPath;
     }
 
     private bool IsWalkable(Vector2Int gridPos) {
+        if (s_walkabilityCache.TryGetValue(gridPos, out bool cached))
+            return cached;
+
         Vector2 worldPos = GridToWorld(gridPos);
-        return Physics2D.OverlapCircle(worldPos, 0.1f, m_wallLayer) == null;
+        bool walkable = Physics2D.OverlapCircle(worldPos, 0.1f, m_wallLayer) == null;
+        s_walkabilityCache[gridPos] = walkable;
+        return walkable;
     }
 
     private int GetHeuristic(Vector2Int a, Vector2Int b) {
         int dx = Mathf.Abs(a.x - b.x);
         int dy = Mathf.Abs(a.y - b.y);
-        return 10 * (dx + dy) - 6 * Mathf.Min(dx, dy); // diagonal distance
+        return 10 * (dx + dy) - 6 * Mathf.Min(dx, dy);
     }
 
     private Vector2Int WorldToGrid(Vector2 worldPos) {
@@ -117,40 +145,39 @@ public class Pathfinder {
         return new Vector2(gridPos.x * k_cellSize, gridPos.y * k_cellSize);
     }
 
-    // ---- PATH NODE ----
     private class PathNode {
         public Vector2Int gridPosition;
         public int gCost = int.MaxValue;
         public int hCost;
         public PathNode parent;
-        public bool walkable;
         public bool opened;
-
         public int fCost => gCost + hCost;
 
-        public PathNode(Vector2Int pos, bool walkable) {
-            this.gridPosition = pos;
-            this.walkable = walkable;
+        public PathNode(Vector2Int pos) {
+            gridPosition = pos;
         }
     }
 
-    // ---- PROSTA KOLEJKA PRIORYTETOWA ----
-    private class SimplePriorityQueue<T> where T : PathNode {
-        private List<T> nodes = new List<T>();
-
+    private class SimplePriorityQueue {
+        private List<PathNode> nodes = new List<PathNode>();
         public int Count => nodes.Count;
 
-        public void Enqueue(T node) {
+        public void Enqueue(PathNode node) {
             nodes.Add(node);
-            nodes.Sort((a, b) => a.fCost.CompareTo(b.fCost)); // prosty sort po fCost
+            // insertion sort — szybszy ni¿ Sort() dla ma³ych list
+            int i = nodes.Count - 1;
+            while (i > 0 && nodes[i].fCost < nodes[i - 1].fCost) {
+                (nodes[i], nodes[i - 1]) = (nodes[i - 1], nodes[i]);
+                i--;
+            }
         }
 
-        public T Dequeue() {
-            if (nodes.Count == 0)
-                return null;
-            T node = nodes[0];
+        public PathNode Dequeue() {
+            PathNode node = nodes[0];
             nodes.RemoveAt(0);
             return node;
         }
+
+        public void Clear() => nodes.Clear();
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class ScoreManagerController : MonoBehaviour {
 
     [SerializeField] private GunController m_gunPrimary;
-
+    [SerializeField] private GameManagerController m_gameManager;
     private void OnEnable() {
         GameEvents.Instance.onGunpickup += OnGunPickup;
     }
@@ -13,5 +13,6 @@ public class ScoreManagerController : MonoBehaviour {
 
     private void OnGunPickup(GunController gun) {
         m_gunPrimary = gun;
+
     }
 }

@@ -5,39 +5,38 @@ using UnityEngine;
 public class PathFollower : MonoBehaviour {
     [Header("Pathfinding")]
     [SerializeField] private LayerMask m_wallLayer;
-    [SerializeField] private float m_waypointTolerance = 0.15f;
-    [SerializeField] private float m_recalculateInterval = 0.5f; // co ile sekund przelicza œcie¿kê
+    [SerializeField] private float m_waypointTolerance = 0.3f;
+    [SerializeField] private float m_recalculateInterval = 0.5f;
 
     private Pathfinder m_pathfinder;
     private List<Vector2> m_path;
     private int m_currentWaypointIndex;
-    private Rigidbody2D m_rb;
-
     private Vector2 m_lastDestination;
-    private const float k_destinationChangeTolerance = 0.1f;
+    private bool m_isRecalculating = false;
+    private const float k_destinationChangeTolerance = 0.3f;
 
     public bool HasPath => m_path != null && m_currentWaypointIndex < m_path.Count;
-    public Vector2 CurrentTarget => HasPath ? m_path[m_currentWaypointIndex] : (Vector2) transform.position;
 
     private void Awake() {
-        m_rb = GetComponent<Rigidbody2D>();
         m_pathfinder = new Pathfinder(m_wallLayer);
     }
 
-    // wywo³uj to z EnemyZombieController gdy cel siê zmienia
     public void SetDestination(Vector2 target) {
-        // uruchom now¹ coroutine tylko gdy cel siê znacz¹co zmieni³
         if (Vector2.Distance(target, m_lastDestination) < k_destinationChangeTolerance)
             return;
 
         m_lastDestination = target;
-        StopAllCoroutines();
-        StartCoroutine(RecalculatePath(target));
+
+        if (!m_isRecalculating) {
+            m_isRecalculating = true;
+            StartCoroutine(RecalculatePath());
+        }
+        // jeœli ju¿ dzia³a — coroutine sam pobierze nowy m_lastDestination
     }
 
-    private IEnumerator RecalculatePath(Vector2 target) {
+    private IEnumerator RecalculatePath() {
         while (true) {
-            List<Vector2> newPath = m_pathfinder.FindPath(transform.position, target);
+            List<Vector2> newPath = m_pathfinder.FindPath(transform.position, m_lastDestination);
             if (newPath != null && newPath.Count > 0) {
                 m_path = newPath;
                 m_currentWaypointIndex = 0;
@@ -46,8 +45,7 @@ public class PathFollower : MonoBehaviour {
         }
     }
 
-    // wywo³uj to z FixedUpdate zombie z aktualn¹ prêdkoœci¹
-    public Vector2 GetMoveDirection(float speed) {
+    public Vector2 GetMoveDirection() {
         if (!HasPath)
             return Vector2.zero;
 
@@ -66,6 +64,7 @@ public class PathFollower : MonoBehaviour {
 
     public void StopPath() {
         StopAllCoroutines();
+        m_isRecalculating = false;
         m_path = null;
     }
 
