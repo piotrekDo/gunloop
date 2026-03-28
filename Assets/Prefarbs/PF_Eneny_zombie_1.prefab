@@ -262,6 +262,7 @@ MonoBehaviour:
   m_alertedSpeed: 2.5
   m_alertedDetectionMultiplier: 1.3
   m_alertedLookAroundTime: 2
+  m_animator: {fileID: 4615637328196261845}
 --- !u!95 &4615637328196261845
 Animator:
   serializedVersion: 7

@@ -31,6 +31,9 @@ public class EnemyZombieController : MonoBehaviour {
     [SerializeField] private float m_alertedDetectionMultiplier = 1.3f;
     [SerializeField] private float m_alertedLookAroundTime = 2f;
 
+    [Header("Other")]
+    [SerializeField] private Animator m_animator;
+
     private enum ZombieState {
         Wander, Alerted, Chase
     }
@@ -73,8 +76,10 @@ public class EnemyZombieController : MonoBehaviour {
         if (CanSeePlayer()) {
             m_lastKnownPlayerPosition = m_player.position; // aktualizuj gdy widzi
             m_state = ZombieState.Chase;
+            m_animator.SetBool("isChasing", true);
         } else if (m_state == ZombieState.Chase) {
             // zgubił gracza — idź do ostatniej znanej pozycji
+            m_animator.SetBool("isChasing", false);
             m_alertTarget = m_lastKnownPlayerPosition;
             m_state = ZombieState.Alerted;
         }
